@@ -1,0 +1,107 @@
+import tkinter as tk
+from tkinter import messagebox
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+from datetime import datetime
+import random
+
+class ReceiptApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Receipt Generator")
+        self.root.configure(bg='#f0f0f0')  # Set background color
+
+        # Create and place widgets with colors
+        tk.Label(root, text="Customer Name:", bg='#f0f0f0', fg='#000080').grid(row=0, column=0, padx=10, pady=10, sticky='e')
+        self.customer_name = tk.Entry(root, bg='#ffffff', fg='#000000')
+        self.customer_name.grid(row=0, column=1, padx=10, pady=10)
+
+        tk.Label(root, text="Items:", bg='#f0f0f0', fg='#000080').grid(row=1, column=0, padx=10, pady=10, sticky='e')
+        self.items = tk.Entry(root, bg='#ffffff', fg='#000000')
+        self.items.grid(row=1, column=1, padx=10, pady=10)
+
+        tk.Label(root, text="Quantity:", bg='#f0f0f0', fg='#000080').grid(row=2, column=0, padx=10, pady=10, sticky='e')
+        self.quantity = tk.Entry(root, bg='#ffffff', fg='#000000')
+        self.quantity.grid(row=2, column=1, padx=10, pady=10)
+
+        tk.Label(root, text="Total Amount:", bg='#f0f0f0', fg='#000080').grid(row=3, column=0, padx=10, pady=10, sticky='e')
+        self.total_amount = tk.Entry(root, bg='#ffffff', fg='#000000')
+        self.total_amount.grid(row=3, column=1, padx=10, pady=10)
+
+        tk.Label(root, text="Payment Type:", bg='#f0f0f0', fg='#000080').grid(row=4, column=0, padx=10, pady=10, sticky='e')
+        self.payment_type = tk.Entry(root, bg='#ffffff', fg='#000000')
+        self.payment_type.grid(row=4, column=1, padx=10, pady=10)
+
+        tk.Label(root, text="Date (YYYY-MM-DD):", bg='#f0f0f0', fg='#000080').grid(row=5, column=0, padx=10, pady=10, sticky='e')
+        self.date = tk.Entry(root, bg='#ffffff', fg='#000000')
+        self.date.grid(row=5, column=1, padx=10, pady=10)
+
+        self.generate_button = tk.Button(root, text="Generate Receipt", command=self.generate_receipt, bg='#000080', fg='#ffffff')
+        self.generate_button.grid(row=6, column=0, columnspan=2, pady=20)
+
+    def generate_receipt(self):
+        customer_name = self.customer_name.get()
+        items = self.items.get()
+        quantity = self.quantity.get()
+        total_amount = self.total_amount.get()
+        payment_type = self.payment_type.get()
+        date = self.date.get()
+
+        # Validate inputs
+        if not customer_name or not items or not quantity or not total_amount or not payment_type or not date:
+            messagebox.showerror("Input Error", "Please fill in all fields.")
+            return
+
+        try:
+            quantity = int(quantity)
+            total_amount = float(total_amount)
+        except ValueError:
+            messagebox.showerror("Input Error", "Quantity must be an integer and Total amount must be a number.")
+            return
+
+        try:
+            date = datetime.strptime(date, '%Y-%m-%d')
+        except ValueError:
+            messagebox.showerror("Input Error", "Date must be in YYYY-MM-DD format.")
+            return
+
+        # Generate a unique receipt number
+        receipt_number = random.randint(1000, 9999)
+
+        # Generate receipt PDF
+        filename = f'receipt_{receipt_number}.pdf'
+        self.create_pdf_receipt(customer_name, items, quantity, total_amount, payment_type, date, receipt_number, filename)
+        messagebox.showinfo("Success", f"Receipt generated successfully and saved as {filename}")
+
+    def create_pdf_receipt(self, customer_name, items, quantity, total_amount, payment_type, date, receipt_number, filename):
+        c = canvas.Canvas(filename, pagesize=letter)
+        width, height = letter
+
+        # Add Title
+        c.setFont("Helvetica-Bold", 16)
+        c.drawString(1 * inch, height - 1 * inch, "Transaction Receipt")
+
+        c.setFont("Helvetica", 12)
+        c.drawString(1 * inch, height - 1.25 * inch, f"Date: {date.strftime('%Y-%m-%d')}")
+
+        c.drawString(1 * inch, height - 1.5 * inch, f"Receipt Number: {receipt_number}")
+
+        c.drawString(1 * inch, height - 1.75 * inch, f"Customer Name: {customer_name}")
+
+        c.drawString(1 * inch, height - 2 * inch, f"Items Purchased: {items}")
+
+        c.drawString(1 * inch, height - 2.25 * inch, f"Quantity: {quantity}")
+
+        c.drawString(1 * inch, height - 2.5 * inch, f"Total Amount: ${total_amount:.2f}")
+
+        c.drawString(1 * inch, height - 2.75 * inch, f"Payment Type: {payment_type}")
+
+        c.drawString(1 * inch, height - 3.25 * inch, "Thank you for your purchase!")
+
+        c.save()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ReceiptApp(root)
+    root.mainloop()
