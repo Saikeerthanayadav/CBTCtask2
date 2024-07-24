@@ -4,7 +4,7 @@ Company: CIPHERBYTE TECHNOLOGIES
 
 
 OVERVIEW OF THE PROJECT:
-Tt involve setting up the graphical interface for a Receipt Generator application using Python with tkinter. Here are the key functions performed by the code:-
+It involve setting up the graphical interface for a Receipt Generator application using Python with tkinter. Here are the key functions performed by the code:-
 - Creating the GUI Elements:
 The code creates labels and entry fields for capturing customer details such as name, items purchased, quantity, and total amount.
 Each label provides a description of the information expected in the corresponding entry field.
